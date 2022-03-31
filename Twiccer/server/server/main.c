@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <stdlib.h>
-//#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 
@@ -26,10 +25,10 @@
 #define SOCKET_ERROR -1
 #define LISTEN_ERROR -1
 #define message_limit 1000000
-#define dir_server "/Users/AMF/Desktop/project with delete tweet part/server/"
-#define dir_Resources "/Users/AMF/Desktop/project with delete tweet part/server/Resources/"
-#define dir_Users "/Users/AMF/Desktop/project with delete tweet part/server/Resources/Users/"
-#define dir_Tweets "/Users/AMF/Desktop/project with delete tweet part/server/Resources/Tweets/"
+#define dir_server "/Users/AMF/Desktop/Fundamentals-Of-Programming-Project-main/Twiccer/server/"
+#define dir_Resources "/Users/AMF/Desktop/Fundamentals-Of-Programming-Project-main/Twiccer/server/Resources/"
+#define dir_Users "/Users/AMF/Desktop/Fundamentals-Of-Programming-Project-main/Twiccer/server/Resources/Users/"
+#define dir_Tweets "/Users/AMF/Desktop/Fundamentals-Of-Programming-Project-main/Twiccer/server/Resources/Tweets/"
 
 struct user_information {
     char username[21];
@@ -197,7 +196,7 @@ void delete_seenTweets( void ) {
     int specifier;
     for ( specifier = 0; ( dirnet_pointer = readdir(dir_pointer) ) != NULL && specifier > 2; ++specifier ) {
         FILE *file_pointer;
-        char file_direction[150] = { 0 };
+        char file_direction[200] = { 0 };
         sprintf( file_direction, dir_Users"%s", dirnet_pointer -> d_name );
         file_pointer = fopen( file_direction, "r" );
         
@@ -250,8 +249,8 @@ void handle_requests( char request[], char response[] ) {
 
 int starts_with( const char *pre, const char *str ) {
     size_t lenpre = strlen(pre), lenstr = strlen(str);
-    return lenstr < lenpre ? 0/*Ambiguous expansion of macro 'false'*/ : memcmp(pre, str, lenpre) == 0;
-}//   COMMENT   COMMENT   COMMENT   COMMENT   COMMENT   COMMENT   COMMENT   COMMENT   COMMENT   COMMENT   COMMENT
+    return lenstr < lenpre ? 0 : memcmp(pre, str, lenpre) == 0;
+}
 
 void signup_function( char request[], char response[] ) {
     char username[22] = { 0 };//because of ',' which will be exist in end of username
@@ -261,7 +260,7 @@ void signup_function( char request[], char response[] ) {
     if ( strlen( username ) + strlen( password ) + 10 != strlen( request ) ) {
         sprintf( response, "{\"type\":\"Error\",\"message\":\"Bad request format.\"}" );
     } else {
-        char file_direction[90] = dir_Users;
+        char file_direction[200] = dir_Users;
         strcpy( file_direction, dir_Users );
         strcat( file_direction, username );
         strcat( file_direction, ".user.json");
@@ -300,7 +299,7 @@ void login_function( char request[], char response[] ) {
     if ( strlen( username ) + strlen( password ) + 9 != strlen( request ) ) {
         sprintf( response, "{\"type\":\"Error\",\"message\":\"Bad request format.\"}" );
     } else {
-        char file_direction[150] = { 0 };
+        char file_direction[200] = { 0 };
         sprintf( file_direction, dir_Users"%s.user.json", username );
         
         FILE *file_pointer;
@@ -392,7 +391,7 @@ void send_tweet_function( char request[], char response[] ) {
             
             ++number_of_sent_tweets;
             FILE *file_pointer;
-            char tweet_file_direction[150] = { 0 };
+            char tweet_file_direction[200] = { 0 };
             sprintf( tweet_file_direction, dir_Tweets"%d.tweet.json", number_of_sent_tweets );
             file_pointer = fopen( tweet_file_direction, "w" );
             
@@ -408,7 +407,7 @@ void send_tweet_function( char request[], char response[] ) {
             fclose( file_pointer );
             cJSON_Delete( root );
             
-            char user_file_direction[100];
+            char user_file_direction[200];
             sprintf( user_file_direction, dir_Users"%s.user.json", online_username );
             file_pointer = fopen( user_file_direction, "r" );
             char *file_string = calloc( 10000000, sizeof(char) );
@@ -426,7 +425,7 @@ void send_tweet_function( char request[], char response[] ) {
             fclose( file_pointer );
             cJSON_Delete( root );
             
-            char number_of_sent_tweets_file_direction[150] = { 0 };
+            char number_of_sent_tweets_file_direction[200] = { 0 };
             sprintf( number_of_sent_tweets_file_direction, dir_Resources"number_of_sent_tweets.txt" );
             file_pointer = fopen( number_of_sent_tweets_file_direction, "w" );
             fprintf( file_pointer, "number of sent tweets: %d\n", number_of_sent_tweets );
@@ -465,7 +464,7 @@ void refresh_function( char request[], char response[] ) {
             printf("from user %s\n", online_username );
             
             FILE *file_pointer;
-            char file_direction[150] = { 0 };
+            char file_direction[200] = { 0 };
             sprintf( file_direction, dir_Users"%s.user.json", online_username );
             file_pointer = fopen( file_direction, "r" );
             char *file_string = calloc( 10000000, sizeof(char) );
@@ -556,7 +555,7 @@ int find_suitable_tweets_from_seenTweets( cJSON *array_pointer, int suitable_twe
         username[strlen( username ) - 1] = '\0';
         
         FILE *file_pointer;
-        char file_direction[150] = { 0 };
+        char file_direction[200] = { 0 };
         sprintf( file_direction, dir_Users"%s.user.json", username + 1 );
         file_pointer = fopen( file_direction, "r" );
         
@@ -642,7 +641,7 @@ void like_function( char request[], char response[] ) {
             printf("from user %s\n", online_username );
             
             FILE *file_pointer;
-            char file_direction[150] = { 0 };
+            char file_direction[200] = { 0 };
             sprintf( file_direction, dir_Tweets"%d.tweet.json", tweet_id );
             if ( ( file_pointer = fopen( file_direction, "r" ) ) == NULL ) {
                 sprintf( response, "{\"type\":\"Error\",\"message\":\"Tweet with this id is not available.\"}" );
@@ -666,7 +665,7 @@ void like_function( char request[], char response[] ) {
                 fclose( file_pointer );
                 
                 cJSON_pointer = cJSON_GetObjectItem( tweet_root, "author" );
-                char incomplete_file_direction[150] = { 0 };
+                char incomplete_file_direction[200] = { 0 };
                 strcpy( incomplete_file_direction, cJSON_PrintUnformatted( cJSON_pointer ) );
                 incomplete_file_direction[strlen( incomplete_file_direction ) - 1] = '\0';
                 memset( file_direction, 0, sizeof(file_direction) );
@@ -709,7 +708,7 @@ void delete_suitable_tweets( cJSON *array_pointer, int array_size, int tweet_id 
     for ( int i = 0; i < array_size; ++i ) {
         cJSON *cJSON_array_item_pointer = cJSON_GetArrayItem( array_pointer, (double)i );
         
-        char file_direction[150] = { 0 }, incomplete_file_direction[150] = { 0 };
+        char file_direction[200] = { 0 }, incomplete_file_direction[200] = { 0 };
         strcpy( incomplete_file_direction, cJSON_PrintUnformatted( cJSON_array_item_pointer ) );
         incomplete_file_direction[strlen( incomplete_file_direction ) - 1] = '\0';
         sprintf( file_direction, dir_Users"%s.user.json", incomplete_file_direction + 1 );
@@ -761,7 +760,7 @@ void comment_function( char request[], char response[] ) {
             printf("from user %s\n", online_username );
             
             FILE *file_pointer;
-            char file_direction[150] = { 0 };
+            char file_direction[200] = { 0 };
             sprintf( file_direction, dir_Tweets"%d.tweet.json", tweet_id );
             if ( ( file_pointer = fopen( file_direction, "r" ) ) == NULL ) {
                 sprintf( response, "{\"type\":\"Error\",\"message\":\"Tweet with this id is not available.\"}" );
@@ -781,7 +780,7 @@ void comment_function( char request[], char response[] ) {
                 fclose( file_pointer );
                 
                 cJSON_pointer_1 = cJSON_GetObjectItem( tweet_root, "author" );
-                char incomplete_file_direction[150] = { 0 };
+                char incomplete_file_direction[200] = { 0 };
                 strcpy( incomplete_file_direction, cJSON_PrintUnformatted( cJSON_pointer_1 ) );
                 incomplete_file_direction[strlen( incomplete_file_direction ) - 1] = '\0';
                 memset( file_direction, 0, sizeof(file_direction) );
@@ -828,7 +827,7 @@ void search_function( char request[], char response[] ) {
             printf("from user %s\n", online_username );
             
             FILE *file_pointer;
-            char file_direction[150] = { 0 };
+            char file_direction[200] = { 0 };
             sprintf( file_direction, dir_Users"%s.user.json", searched_username );
             if ( ( file_pointer = fopen( file_direction, "r" ) ) == NULL ) {
                 sprintf( response, "{\"type\":\"Error\",\"message\":\"This username is not valid.\"}" );
@@ -924,7 +923,7 @@ void follow_function( char request[], char response[] ) {
             printf("from user %s\n", online_username );
             
             FILE *file_pointer;
-            char file_direction[150] = { 0 };
+            char file_direction[200] = { 0 };
             sprintf( file_direction, dir_Users"%s.user.json", username );
             if ( ( file_pointer = fopen( file_direction, "r" ) ) == NULL ) {
                 sprintf( response, "{\"type\":\"Error\",\"message\":\"This username is not valid.\"}" );
@@ -997,7 +996,7 @@ void unfollow_function( char request[], char response[] ) {
             printf("from user %s\n", online_username );
             
             FILE *file_pointer;
-            char file_direction[150] = { 0 };
+            char file_direction[200] = { 0 };
             sprintf( file_direction, dir_Users"%s.user.json", username );
             if ( ( file_pointer = fopen( file_direction, "r" ) ) == NULL ) {
                 sprintf( response, "{\"type\":\"Error\",\"message\":\"This username is not valid.\"}" );
@@ -1077,7 +1076,7 @@ void profile_function( char request[], char response[] ) {//the same function as
             printf("from user %s\n", online_username );
             
             FILE *file_pointer;
-            char file_direction[150] = { 0 };
+            char file_direction[200] = { 0 };
             sprintf( file_direction, dir_Users"%s.user.json", online_username );
             file_pointer = fopen( file_direction, "r" );
             char *file_string = calloc( 10000000, sizeof(char) );
@@ -1151,7 +1150,7 @@ void set_bio_function( char request[], char response[] ) {
             printf("from user %s\n", online_username );
             
             FILE *file_pointer;
-            char file_direction[150] = { 0 };
+            char file_direction[200] = { 0 };
             sprintf( file_direction, dir_Users"%s.user.json", online_username );
             file_pointer = fopen( file_direction, "r" );
             char *file_string = calloc( 10000000, sizeof(char) );
@@ -1202,7 +1201,7 @@ void change_password_function( char request[], char response[] ) {
                 strcpy( new_password, new_password_test );
                 
                 FILE *file_pointer;
-                char file_direction[150] = { 0 };
+                char file_direction[200] = { 0 };
                 sprintf( file_direction, dir_Users"%s.user.json", online_username );
                 file_pointer = fopen( file_direction, "r" );
                 char *file_string = calloc( 10000000, sizeof(char) );
@@ -1278,7 +1277,7 @@ void delete_tweet_function( char request[], char response[] ) {
             printf("from user %s\n", online_username );
             
             FILE *file_pointer;
-            char file_direction[150] = { 0 };
+            char file_direction[200] = { 0 };
             sprintf( file_direction, dir_Tweets"%d.tweet.json", tweet_id );
             if ( ( file_pointer = fopen( file_direction, "r" ) ) == NULL ) {
                 sprintf( response, "{\"type\":\"Error\",\"message\":\"Tweet with this id is not available.\"}" );
